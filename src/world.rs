@@ -77,6 +77,7 @@ impl World {
 
 struct GameWorld {
     n_steps: u32,
+    n_parts: u32,
     empty: HashSet<Uvec2>,
     snake: Snake,
     food_coordinates: Uvec2,
@@ -108,6 +109,7 @@ impl GameWorld {
 
         Self { 
             n_steps: 0, 
+            n_parts: n_parts as u32, 
             empty: empty,
             snake: snake, 
             food_coordinates: food_coordinates 
@@ -115,6 +117,7 @@ impl GameWorld {
     }
 
     pub fn simulation_step(&mut self) {
+        self.n_steps += 1;
         // =============================================== Update Snake ================================================
         let (clear_option, new_pos) = self.snake.step(self.food_coordinates);
         // =============================================================================================================
@@ -127,7 +130,7 @@ impl GameWorld {
 
         // =============================================== Update Empty ================================================
         self.empty.remove(&new_pos);
-        if let Some(pos) = clear_option {
+        if let Some(pos) = clear_option && self.n_steps >= self.n_parts {
             self.empty.insert(pos);
         }
         // =============================================================================================================
@@ -137,8 +140,6 @@ impl GameWorld {
             self.food_coordinates = Self::find_random_empty(&self.empty);
         }
         // =============================================================================================================
-
-        self.n_steps += 1;
     }
 
     fn find_random_empty(empty: &HashSet<Uvec2>) -> Uvec2 {
