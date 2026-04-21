@@ -99,4 +99,26 @@ impl Direction {
     pub fn identity(current: Self) -> Self {
         current
     }
+
+    pub fn get_connection(from: Self, to: Self) -> char {
+        let mask = Self::bit(from) | Self::bit(to);
+        match mask {
+            0b1100 | 0b1000 | 0b0100 => '\u{2501}', // ━
+            0b0011 | 0b0010 | 0b0001 => '\u{2503}', // ┃
+            0b1001                   => '\u{250F}', // ┏
+            0b0110                   => '\u{251B}', // ┛
+            0b0101                   => '\u{2513}', // ┓
+            0b1010                   => '\u{2517}', // ┗
+            _ => panic!("Unknown Connection!"),
+        }
+    }
+
+    fn bit(dir: Self) -> u8 {
+        match dir {
+            Direction::Right => 0b1000,
+            Direction::Left => 0b0100,
+            Direction::Up => 0b0010,
+            Direction::Down => 0b0001,
+        }
+    }
 }
