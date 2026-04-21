@@ -1,10 +1,8 @@
 use std::collections::VecDeque;
 
-use ratatui::style::Color;
-
 use crate::hamilton::Hamilton;
 use crate::utility::{Uvec2, Direction};
-use crate::world::{Element, World};
+use crate::world::{World};
 
 pub struct Snake {
     body: VecDeque<BodyPart>,
@@ -13,7 +11,7 @@ pub struct Snake {
 }
 
 impl Snake {
-    pub fn new(start: Uvec2, n_parts: usize, world: &mut World) -> Self {        
+    pub fn new(start: Uvec2, n_parts: usize, size: Uvec2) -> Self {        
         // ============================================= Build Snake ===============================================
         let mut body: VecDeque<BodyPart> = VecDeque::new();
         let facing: Direction = Direction::Right;
@@ -22,11 +20,10 @@ impl Snake {
             let part: BodyPart = BodyPart::new(start);
             body.push_back(part);
         }
-        world.write(start, Direction::get_connection(facing, facing), Element::Snake);
         // =========================================================================================================
 
         // ============================================ Build Hamilton =============================================
-        let mut hamilton = Hamilton::new(&world);
+        let mut hamilton = Hamilton::new(size);
         hamilton.build();
         // =========================================================================================================
 

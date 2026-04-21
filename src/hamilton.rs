@@ -13,13 +13,12 @@ pub struct Hamilton {
 }
 
 impl Hamilton {
-    pub fn new(world: &World) -> Self {
-        let size = world.get_size();
+    pub fn new(size: Uvec2) -> Self {
         let spanning_tree_size = Uvec2 { x: size.x / 2, y: size.y / 2};
         let mut spanning_tree = SpanningTree::new(spanning_tree_size);
         spanning_tree.build();
         let cycle: Vec<usize> = vec![0; (size.x * size.y) as usize];
-        Self { size: world.get_size(), spanning_tree: spanning_tree, cycle:cycle }
+        Self { size: size, spanning_tree: spanning_tree, cycle:cycle }
     }
 
     pub fn build(&mut self) {

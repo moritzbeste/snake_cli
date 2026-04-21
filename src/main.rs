@@ -35,14 +35,6 @@ fn main() -> Result<(), io::Error> {
     let color_food: Color = Color::Yellow;
     let mut world: World = World::new(width, height, color_snake, color_food);
     // =========================================================================================================
-
-    // ============================================== Build Snake ==============================================
-    let n_parts: usize = 3;
-    if n_parts < 1 { panic!("Initial Snake Length too short!"); }
-    let start_x: usize = 1;
-    let start: Uvec2 = Uvec2 { x: start_x, y: world.get_size().y / 2 };
-    let mut snake: Snake = Snake::new(start, n_parts, &mut world);
-    // =========================================================================================================
     
     // =============================================== Game Loop ===============================================
     loop {

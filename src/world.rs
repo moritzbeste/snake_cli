@@ -1,4 +1,5 @@
-use crate::utility::Uvec2;
+use crate::{snake::Snake, utility::Uvec2};
+use std::collections::VecDeque;
 
 use ratatui::{
     buffer::{Cell, Buffer}, layout::{Rect}, widgets::Widget, style::{Color, Style}
@@ -6,7 +7,6 @@ use ratatui::{
 
 pub struct World {
     size: Uvec2,
-    frame: Frame,
     game_world: GameWorld,
     color_snake: Color,
     color_food: Color,
@@ -33,106 +33,46 @@ impl Widget for &World {
 impl World {
     pub fn new(width: usize, height: usize, color_snake: Color, color_food: Color) -> Self {
         Self {
-            size: Uvec2 { x: width - 2, y: height - 2 },
-            frame: Frame::new(width, height),
-            game_world: GameWorld::new(width - 2, height - 2),
+            size: Uvec2 { x: width, y: height },
+            game_world: GameWorld::new(size),
             color_snake: color_snake, 
             color_food: color_food,
         }
     }
 
-    pub fn write(&mut self, pos: Uvec2, c: char, element: Element) {
-        let color = match element {
-            Element::Snake => self.color_snake,
-            Element::Food => self.color_food,
-            Element::Empty => Color::Black,
-        };
-        self.frame.write_frame(pos, c, color);
-        self.game_world.set(pos, element);
-    }
-
     pub fn get_size(&self) -> Uvec2 {
         self.size
     }
-}
 
-struct Frame {
-    frame_size: Uvec2,
-    frame: Vec<Cell>,
-}
+    fn construct_frame(&self) -> Vec<Cell> {
 
-
-impl Frame {
-    pub fn new(width: usize, height: usize) -> Self {
-        Self { 
-            frame_size: Uvec2 { x: width, y: height }, 
-            frame: Self::build_frame(width, height), 
-        }
-    }
-
-    pub fn write_frame(&mut self, pos: Uvec2, c: char, color: Color) {
-        let idx: usize = (pos.y + 1) * self.frame_size.x + pos.x + 1;
-        let cell = &mut self.frame[idx];
-        cell.set_char(c);
-        cell.set_style(Style::default().fg(color));
-    } 
-
-    fn build_frame(width: usize, height: usize) -> Vec<Cell> {
-        let mut frame : Vec<Cell> = vec![Cell::default(); width * height];
-        // putting in corners
-        frame[0].set_char('\u{2554}');                    // ╔
-        frame[width - 1].set_char('\u{2557}');            // ╗
-        frame[(height - 1) * width].set_char('\u{255A}'); // ╚
-        frame[height * width - 1].set_char('\u{255D}');   // ╝
-        
-        // iterate column wise
-        for i in 1..height - 1 {
-            // left edge
-            frame[i * width].set_char('\u{2551}');           // ║
-            // right edge
-            frame[(i + 1) * width - 1].set_char('\u{2551}'); // ║
-        }
-        // iterate row wise
-        let offset = (height - 1) * width;
-        for i in 1..width - 1 {
-            // top edge
-            frame[i].set_char('\u{2550}'); // ═
-            // bottom edge
-            frame[offset + i].set_char('\u{2550}'); // ═
-        }
-        frame
     }
 }
 
 struct GameWorld {
-    width: usize,
-    board: Vec<Element>,
+    n_steps: u32,
+    size: Uvec2,
+    snake: Snake,
     food_coordinates: Uvec2,
-    empty_cells: Vec<Uvec2>,
+    empty_cells: VecDeque<Uvec2>,
 }
 
 impl GameWorld {
-    pub fn new(width: usize, height: usize) -> Self {
-        let board: Vec<Element> = vec![Element::Empty; width * height];
-        Self { width: width, board: board }
-    }
+    pub fn new(size: Uvec2) -> Self {
+        // ============================================== Build Snake ==============================================
+        let n_parts: usize = 3;
+        if n_parts < 1 { panic!("Initial Snake Length too short!"); }
+        let start_x: usize = 1;
+        let start: Uvec2 = Uvec2 { x: start_x, y: size.y / 2 };
+        let mut snake: Snake = Snake::new(start, n_parts, size);
+        // =========================================================================================================
 
-    pub fn get(&self, pos: Uvec2) -> Element {
-        self.board[pos.y * self.width + pos.x]
-    }
-
-    pub fn set(&mut self, pos: Uvec2, element: Element) {
-        self.board[pos.y * self.width + pos.x] = element;
+        // ============================================== Build Empty ==============================================
+        let empty_cells: VecDeque<Uvec2> = VecDeque::new();
+        // =========================================================================================================
     }
 
     pub fn find_random_empty() -> Uvec2 {
         todo!();
     }
-}
-
-#[derive(Clone, Copy)]
-pub enum Element {
-    Empty,
-    Snake,
-    Food,
 }
