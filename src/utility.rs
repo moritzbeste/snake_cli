@@ -17,7 +17,7 @@ impl Add for Ivec2 {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Hash, Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Uvec2 {
     pub x: usize,
     pub y: usize,
@@ -47,13 +47,9 @@ impl Uvec2 {
             y: y as usize, 
         })
     }
-
-    pub fn equals(one: &Self, two: &Self) -> bool {
-        one.x == two.x && one.y == two.y
-    }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Direction {
     Right,
     Left,
@@ -93,6 +89,15 @@ impl Direction {
             Direction::Left  => Direction::Down, 
             Direction::Up    => Direction::Left,
             Direction::Down  => Direction::Right, 
+        }
+    }
+
+    pub fn opposite(current: Self) -> Self {
+        match current {
+            Direction::Right => Direction::Left,
+            Direction::Left  => Direction::Right, 
+            Direction::Up    => Direction::Down,
+            Direction::Down  => Direction::Up, 
         }
     }
 

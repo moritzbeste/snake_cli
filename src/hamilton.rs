@@ -1,9 +1,8 @@
 use std::vec;
 
-use crate::world::World;
 use crate::utility::{Uvec2, Direction};
 use rand::Rng;
-use rand::seq::SliceRandom;
+use rand::seq::{SliceRandom};
 
 
 pub struct Hamilton {
@@ -24,41 +23,41 @@ impl Hamilton {
     pub fn build(&mut self) {
         let total_size: usize = self.size.x * self.size.y;
         let turn_priority: Vec<fn(Direction) -> Direction> = vec![Direction::right_of, Direction::identity, Direction::left_of];
-        let mut current_coordinate: Uvec2 = Uvec2 { x: 0, y: 0 };
+        let mut current_coordinates: Uvec2 = Uvec2 { x: 0, y: 0 };
         let mut current_facing: Direction = Direction::Up;
         let mut current_member: usize = 1;
         while current_member < total_size {
             // attempt to turn right, then straight, then left to hug the SpanningTree wall
             for i in 0..3 {
                 let turn = turn_priority[i](current_facing);
-                if self.check_direction(turn, &current_coordinate) {
+                if self.check_direction(turn, &current_coordinates) {
                     current_facing = turn;
                     break;
                 }
             }
-            let option = current_coordinate.add_delta(current_facing, &self.size);
-            current_coordinate = match option {
+            let option = current_coordinates.add_delta(current_facing, &self.size);
+            current_coordinates = match option {
                 Option::None => panic!("Invalid Step executed!"),
-                Some(x) => x,
+                Option::Some(x) => x,
             };
-            self.set_member(current_coordinate, current_member);
+            self.set_member(current_coordinates, current_member);
             current_member += 1;
         }
     }
 
-    fn check_direction(&self, turn: Direction, current_coordinate: &Uvec2) -> bool {
-        let to_option: Option<Uvec2> = current_coordinate.add_delta(turn, &self.size);
-        let to_coordinate = match to_option {
+    fn check_direction(&self, turn: Direction, current_coordinates: &Uvec2) -> bool {
+        let to_option: Option<Uvec2> = current_coordinates.add_delta(turn, &self.size);
+        let to_coordinates = match to_option {
             Option::None => return false,
-            Some(ref c) => c,
+            Option::Some(ref c) => c,
         };
 
-        let option: Option<Uvec2> = self.edge_to_check(current_coordinate, to_coordinate);
+        let option: Option<Uvec2> = self.edge_to_check(current_coordinates, to_coordinates);
         let to_node: Uvec2 = match option {
             Option::None => return true,
-            Some(x) => x,
+            Option::Some(x) => x,
         };
-        let current_node: &CellNode = self.spanning_tree.get(Uvec2 { x: current_coordinate.x / 2, y: current_coordinate.y / 2 });
+        let current_node: &CellNode = self.spanning_tree.get(Uvec2 { x: current_coordinates.x / 2, y: current_coordinates.y / 2 });
         !current_node.has_edge(&to_node)
     }
 
@@ -66,7 +65,7 @@ impl Hamilton {
         let from_tile: Uvec2 = Uvec2 { x: from.x / 2, y: from.y / 2 };
         let to_tile:   Uvec2 = Uvec2 { x: to.x / 2,   y: to.y / 2 };
 
-        if Uvec2::equals(&from_tile, &to_tile) {
+        if from_tile == to_tile {
             let from_pos: Uvec2 = Uvec2 { x: from.x % 2, y: from.y % 2 };
             let to_pos:   Uvec2 = Uvec2 { x: to.x % 2,   y: to.y % 2 };
 
@@ -84,7 +83,7 @@ impl Hamilton {
             let check_option = from_tile.add_delta(dir, &self.spanning_tree.size);
             match check_option {
                 Option::None => return Option::None,
-                Some(c) => return Some(c),
+                Option::Some(c) => return Option::Some(c),
             };
         }
         Option::None
@@ -95,12 +94,12 @@ impl Hamilton {
         let mut count = 0;
         let length: usize = self.size.x * self.size.y;
         for i in 0..self.cycle.len() {
-            let coordinate = Uvec2 { x: i % self.size.x, y: i / self.size.x };
+            let coordinates = Uvec2 { x: i % self.size.x, y: i / self.size.x };
             let mut v: Vec<bool> = Vec::new();
             for d in Direction::ALL {
-                let b = match coordinate.add_delta(d, &self.size) {
+                let b = match coordinates.add_delta(d, &self.size) {
                     Option::None => false,
-                    Some(pos) => self.is_prev_or_next(length, pos, i),
+                    Option::Some(pos) => self.is_prev_or_next(length, pos, i),
                 };
                 v.push(b);
             }
@@ -136,14 +135,12 @@ impl Hamilton {
         self.cycle[current_index] == prev || self.cycle[current_index] == next
     }
 
-    #[allow(dead_code)]
-    pub fn get_member(&self, coordinate: Uvec2) -> usize {
-        self.cycle[coordinate.y * self.size.x + coordinate.x]
+    pub fn get_member(&self, pos: Uvec2) -> usize {
+        self.cycle[pos.y * self.size.x + pos.x]
     }
 
-
-    fn set_member(&mut self, coordinate: Uvec2, member: usize) {
-        self.cycle[coordinate.y * self.size.x + coordinate.x] = member;
+    fn set_member(&mut self, pos: Uvec2, member: usize) {
+        self.cycle[pos.y * self.size.x + pos.x] = member;
     }
 }
 
@@ -162,15 +159,15 @@ impl SpanningTree {
         Self { size: size, length: length, nodes: nodes, visited: visited }
     }
 
-    fn set(&mut self, coordinate: Uvec2, node: CellNode) {
-        self.nodes[coordinate.y * self.size.x + coordinate.x] = Some(node);
+    fn set(&mut self, coordinates: Uvec2, node: CellNode) {
+        self.nodes[coordinates.y * self.size.x + coordinates.x] = Option::Some(node);
     }
 
-    pub fn get(&self, coordinate: Uvec2) -> &CellNode {
-        let value: Option<&CellNode> = self.nodes[coordinate.y * self.size.x + coordinate.x].as_ref();
+    pub fn get(&self, coordinates: Uvec2) -> &CellNode {
+        let value: Option<&CellNode> = self.nodes[coordinates.y * self.size.x + coordinates.x].as_ref();
         match value {
             Option::None => panic!("Accessed Value is None!"),
-            Some(v) => v,
+            Option::Some(v) => v,
         }
     }
 
@@ -178,13 +175,13 @@ impl SpanningTree {
         let mut rng = rand::thread_rng();
         let start_x = rng.gen_range(0..self.size.x);
         let start_y = rng.gen_range(0..self.size.y);
-        let start_coordinate: Uvec2 = Uvec2 { x: start_x, y: start_y };
-        self.set(start_coordinate, CellNode::new(start_coordinate));
+        let start_coordinates: Uvec2 = Uvec2 { x: start_x, y: start_y };
+        self.set(start_coordinates, CellNode::new(start_coordinates));
         let mut items: usize = 1;
         while items < self.length {
             let neighbors: Vec<Neighbor> = self.find_current_neighbors();
             let choice = neighbors.choose(&mut rng);
-            if let Some(nref) = choice {
+            if let Option::Some(nref) = choice {
                 let from_idx = nref.from;
                 let to_coord = nref.to;
                 let mut to_node = CellNode::new(to_coord);
@@ -196,7 +193,7 @@ impl SpanningTree {
             
                 let from_coord = {
                     let from_node = self.nodes[from_idx].as_ref().unwrap();
-                    from_node.coordinate
+                    from_node.coordinates
                 };
                 to_node.add_edge(from_coord);
             
@@ -214,7 +211,7 @@ impl SpanningTree {
         self.set_visited();
         for i in 0..self.nodes.len() {
             let node = &self.nodes[i];
-            if let Some(nref) = node.as_ref() {
+            if let Option::Some(nref) = node.as_ref() {
                 let visible: Vec<Uvec2> = nref.neighbors(self.size);
                 for n in visible {
                     let idx = n.y * self.size.x + n.x;
@@ -240,13 +237,13 @@ impl SpanningTree {
         for op in &self.nodes {
             let node = match op {
                 Option::None => &CellNode::new(Uvec2 { x: self.size.x + 100, y: self.size.y + 100 }),
-                Some(x) => x,
+                Option::Some(x) => x,
             };
             let mut v: Vec<bool> = Vec::new();
             for d in Direction::ALL {
-                let b = match node.get_coordinate().add_delta(d, &self.size) {
+                let b = match node.get_coordinates().add_delta(d, &self.size) {
                     Option::None => false,
-                    Some(pos) => node.has_edge(&pos),
+                    Option::Some(pos) => node.has_edge(&pos),
                 };
                 v.push(b);
             }
@@ -287,21 +284,21 @@ struct Neighbor {
 
 #[derive(Clone)]
 struct CellNode {
-    coordinate: Uvec2,
+    coordinates: Uvec2,
     edges: Vec<Uvec2>,
 }
 
 impl CellNode {
-    pub fn new(coordinate: Uvec2) -> Self {
-        Self { coordinate: coordinate, edges: vec![] }
+    pub fn new(coordinates: Uvec2) -> Self {
+        Self { coordinates: coordinates, edges: vec![] }
     }
 
     pub fn neighbors(&self, size: Uvec2) -> Vec<Uvec2> {
         let mut neighbors = vec![];
         for d in Direction::ALL {
-            match self.coordinate.add_delta(d, &size) {
+            match self.coordinates.add_delta(d, &size) {
                 Option::None => continue,
-                Some(pos) => neighbors.push(pos),
+                Option::Some(pos) => neighbors.push(pos),
             }
         }
         neighbors
@@ -312,10 +309,10 @@ impl CellNode {
     }
 
     pub fn has_edge(&self, to: &Uvec2) -> bool {
-        self.edges.iter().any(|edge| Uvec2::equals(edge, to))
+        self.edges.iter().any(|edge| edge == to)
     }
 
-    pub fn get_coordinate(&self) -> Uvec2 {
-        self.coordinate
+    pub fn get_coordinates(&self) -> Uvec2 {
+        self.coordinates
     }
 }

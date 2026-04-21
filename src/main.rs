@@ -13,9 +13,7 @@ mod utility;
 mod world;
 mod hamilton;
 mod snake;
-use utility::Uvec2;
 use world::World;
-use snake::Snake;
 
 fn main() -> Result<(), io::Error> {
     enable_raw_mode()?;
@@ -26,14 +24,15 @@ fn main() -> Result<(), io::Error> {
     let mut terminal = Terminal::new(backend)?;
     let size = terminal.size()?;
 
-    // ============================================== Build Frame ==============================================
-    let width: usize = if size.width % 2 == 0 { size.width  as usize} else { (size.width - 1) as usize};
+    // ============================================== Build World ==============================================
+    let width:  usize = if size.width  % 2 == 0 { size.width  as usize}  else { (size.width - 1) as usize};
     let height: usize = if size.height % 2 == 0 { size.height  as usize} else { (size.height - 1) as usize};
-    assert!(width >= 4, "width too small!");
-    assert!(height >= 4, "height too small!");
+    assert!(width  >= 2, "width too small!");
+    assert!(height >= 2, "height too small!");
+    let n_parts: usize = 3;
     let color_snake: Color = Color::Green;
-    let color_food: Color = Color::Yellow;
-    let mut world: World = World::new(width, height, color_snake, color_food);
+    let color_food:  Color = Color::Yellow;
+    let mut world:   World = World::new(width, height, n_parts, color_snake, color_food);
     // =========================================================================================================
     
     // =============================================== Game Loop ===============================================
@@ -44,11 +43,12 @@ fn main() -> Result<(), io::Error> {
             f.render_widget(&world, size);
         })?;
 
-        // update snake
-        // TODO
+        // simulation step
+        world.simulation_step();
+        //thread::sleep(Duration::from_millis(10));
 
         // handle input
-        if event::poll(Duration::from_millis(10))? {
+        if event::poll(Duration::from_millis(1))? {
             if let Event::Key(key) = event::read()? {
                 if key.code == KeyCode::Char('q') {
                     break;
