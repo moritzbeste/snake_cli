@@ -24,12 +24,12 @@ fn main() -> Result<(), io::Error> {
     let (w, h) = size()?;
 
     // ============================================ Hyperparameters ============================================
-    let sleep_ms: u64 = 1;
+    let sleep_ms: u64 = 0;
     let n_parts: usize = 3;
     let color_snake: Color = Color::Green;
     let color_food:  Color = Color::Yellow;
     let color_reset: Color = Color::Reset;
-    let auto_replay: bool = true;
+    let auto_replay: bool = false;
     // =========================================================================================================
 
     // ============================================== Build World ==============================================

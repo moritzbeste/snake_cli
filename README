@@ -1,6 +1,10 @@
 This is an implementation of the iconic snake game as a visual CLI tool, solved by loosely following a hamiltonian cycle. 
 
+Dependencies:
+crossterm = "0.27"
+rand = "0.8"
+queues = "1.0.2"
+
 TODO:
--support automatically restarting after crash
 -support passing hyperparameters through the command line
 -support different strategies
