@@ -10,10 +10,9 @@ pub struct Snake {
 }
 
 impl Snake {
-    pub fn new(start: Uvec2, n_parts: usize, size: Uvec2) -> Self {        
+    pub fn new(start: Uvec2, n_parts: usize, size: Uvec2, facing: Direction) -> Self {        
         // ============================================= Build Snake ===============================================
         let mut body: VecDeque<BodySegment> = VecDeque::new();
-        let facing: Direction = Direction::Right;
 
         for _i in 0..n_parts {
             let part: BodySegment = BodySegment::new(start, Direction::opposite(facing), facing);
@@ -37,8 +36,8 @@ impl Snake {
         self.body.back().unwrap()
     } 
 
-    pub fn get_body(&self) -> &VecDeque<BodySegment> {
-        &self.body
+    pub fn peek_second(&self) -> Option<&BodySegment> {
+        self.body.get(1)
     }
 
     pub fn step(&mut self, food_coordinates: Uvec2) -> (Option<Uvec2>, Uvec2) {
