@@ -15,12 +15,6 @@ mod snake;
 use world::{World, GameState};
 
 fn main() -> Result<(), io::Error> {
-    enable_raw_mode()?;
-    let mut stdout = io::stdout();
-    execute!(stdout, Hide)?;
-    execute!(stdout, EnterAlternateScreen)?;
-    execute!(stdout, Clear(ClearType::All)).unwrap();
-
     let (w, h) = size()?;
 
     // ============================================ Hyperparameters ============================================
@@ -29,7 +23,7 @@ fn main() -> Result<(), io::Error> {
     let color_snake: Color = Color::Green;
     let color_food:  Color = Color::Yellow;
     let color_reset: Color = Color::Reset;
-    let auto_replay: bool = false;
+    let auto_replay: bool = true;
     // =========================================================================================================
 
     // ============================================== Build World ==============================================
@@ -41,6 +35,11 @@ fn main() -> Result<(), io::Error> {
     // =========================================================================================================
     
     // =============================================== Game Loop ===============================================
+    enable_raw_mode()?;
+    let mut stdout = io::stdout();
+    execute!(stdout, Hide)?;
+    execute!(stdout, EnterAlternateScreen)?;
+    execute!(stdout, Clear(ClearType::All)).unwrap();
     let final_state: GameState;
     loop {
         // simulation step
