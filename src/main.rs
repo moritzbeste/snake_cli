@@ -24,6 +24,9 @@ fn main() -> Result<(), io::Error> {
 
     // ============================================ Hyperparameters ============================================
     let sleep_ms: u64 = 5;
+    let n_parts: usize = 3;
+    let color_snake: Color = Color::Green;
+    let color_food:  Color = Color::Yellow;
     // =========================================================================================================
 
     // ============================================== Build World ==============================================
@@ -31,9 +34,6 @@ fn main() -> Result<(), io::Error> {
     let height: usize = if h % 2 == 0 { h  as usize} else { (h - 1) as usize};
     assert!(width  >= 2, "width too small!");
     assert!(height >= 2, "height too small!");
-    let n_parts: usize = 3;
-    let color_snake: Color = Color::Green;
-    let color_food:  Color = Color::Yellow;
     let mut world:   World = World::new(width, height, n_parts, color_snake, color_food);
     // =========================================================================================================
     

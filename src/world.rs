@@ -9,7 +9,6 @@ use crossterm::{
 use rand::{thread_rng, prelude::IteratorRandom};
 
 pub struct World {
-    size: Uvec2,
     color_snake: Color,
     color_food: Color,
     n_steps: u32,
@@ -52,7 +51,6 @@ impl World {
         // =============================================================================================================
 
         Self {
-            size: size,
             color_snake: color_snake, 
             color_food: color_food,
             n_steps: 0, 
@@ -62,11 +60,7 @@ impl World {
             food_pos: food_pos 
         }
     }
-
-    pub fn get_size(&self) -> Uvec2 {
-        self.size
-    }
-
+    
     pub fn simulation_step(&mut self) {
         self.n_steps += 1;
         // =============================================== Update Snake ================================================
