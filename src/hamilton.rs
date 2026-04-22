@@ -7,6 +7,7 @@ use rand::seq::{SliceRandom};
 
 pub struct Hamilton {
     size: Uvec2,
+    len: usize,
     spanning_tree: SpanningTree,
     pub cycle: Vec<usize>,
 }
@@ -17,7 +18,7 @@ impl Hamilton {
         let mut spanning_tree = SpanningTree::new(spanning_tree_size);
         spanning_tree.build();
         let cycle: Vec<usize> = vec![0; (size.x * size.y) as usize];
-        Self { size: size, spanning_tree: spanning_tree, cycle:cycle }
+        Self { size: size, len: size.x * size.y, spanning_tree: spanning_tree, cycle:cycle }
     }
 
     pub fn build(&mut self) {
@@ -134,6 +135,19 @@ impl Hamilton {
         else { next = n; }
         self.cycle[current_index] == prev || self.cycle[current_index] == next
     }
+
+    pub fn is_next(&self, current: usize, is_next: usize) -> bool {
+        is_next == (current + 1) % self.len
+    }
+
+    pub fn is_between(bound1: usize, bound2: usize, index: usize) -> bool {
+        if bound1 > bound2 {
+            index >= bound2 && index <= bound1
+        }
+        else {
+            index >= bound2 || index <= bound1
+        }
+    } 
 
     pub fn get_member(&self, pos: Uvec2) -> usize {
         self.cycle[pos.y * self.size.x + pos.x]
