@@ -48,12 +48,20 @@ impl Snake {
         let new_pos: Uvec2 = head_pos.add_delta(head_to, &self.size).unwrap();
         let path: Direction = self.find_path(new_pos, head_to, self.hamilton.get_member(food_coordinates));
 
-        if new_pos == food_coordinates {
-            let growth: BodySegment = BodySegment::new(new_pos, Direction::opposite(head_to), path); 
-            self.body.push_front(growth);
+        self.update_snake(new_pos == food_coordinates, new_pos, path)
+    }
+
+    fn update_snake(&mut self, ate: bool, new_pos: Uvec2, path: Direction) -> (Option<Uvec2>, Uvec2) {
+        let head_to: Direction = self.peek_head().get_to();
+        if ate {
+            // if the snake ate, a new segment is added
+            let new_head: BodySegment = BodySegment::new(new_pos, Direction::opposite(head_to), path); 
+            self.body.push_front(new_head);
+
             return (Option::None, new_pos);
         }
         else {
+            // if the snake did not eat, the tail is moved to the front and is the new head
             let mut segment: BodySegment = self.body.pop_back().unwrap();
             let clear_pos: Uvec2 = segment.get_coordinates();
             segment.set_coordinates(new_pos);
@@ -100,7 +108,7 @@ impl Snake {
             }
         }
         if best_cont == Direction::opposite(head_to) {next_cont }
-        else {best_cont }
+        else { best_cont }
     }
 
     pub fn peek_head(&self) -> &BodySegment {
@@ -152,5 +160,3 @@ impl BodySegment {
         self.to = to;
     }
 }
-
-
