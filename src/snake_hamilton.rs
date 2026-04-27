@@ -78,6 +78,7 @@ impl SnakeHamilton {
         let tail_index: usize = self.hamilton.get_member(self.peek_tail().get_coordinates());
 
         let mut best_cont: Direction = Direction::opposite(head_to);
+        let mut next_cont: Direction = best_cont;
         let mut best_dist: usize = self.size.x * self.size.y;
         let max_index: usize =  best_dist - 1;
         for d in Direction::ALL {
@@ -88,7 +89,9 @@ impl SnakeHamilton {
                 Option::None => continue,
             };
 
-            if !Hamilton::is_between(head_index, tail_index, check_index) {
+            if self.hamilton.is_next(head_index, check_index) { next_cont = d };
+
+            if !self.hamilton.is_between(head_index, tail_index, check_index) {
                 let dist_food: usize;
                 if food_index < check_index {
                     dist_food = max_index - check_index + food_index;
@@ -102,7 +105,8 @@ impl SnakeHamilton {
                 }
             }
         }
-        best_cont
+        if best_cont == Direction::opposite(head_to) { next_cont }
+        else { best_cont }
     }
 
     pub fn peek_head(&self) -> &BodySegment {

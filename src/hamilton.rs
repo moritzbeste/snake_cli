@@ -140,7 +140,7 @@ impl Hamilton {
         is_next == (current + 1) % self.len
     }
 
-    pub fn is_between(bound1: usize, bound2: usize, index: usize) -> bool {
+    pub fn is_between(&self, bound1: usize, bound2: usize, index: usize) -> bool {
         if bound1 > bound2 {
             index >= bound2 && index <= bound1
         }
