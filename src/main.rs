@@ -23,7 +23,7 @@ fn main() -> Result<(), io::Error> {
     execute!(stdout, Clear(ClearType::All)).unwrap();
 
     // ============================================ Hyperparameters ============================================
-    let sleep_ms: u64 = 0;
+    let sleep_ms: u64 = 5;
     let n_parts: usize = 3;
     let color_snake: Color = Color::Green;
     let color_food:  Color = Color::Yellow;
