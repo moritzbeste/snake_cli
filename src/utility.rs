@@ -127,3 +127,40 @@ impl Direction {
         }
     }
 }
+
+#[derive(Clone)]
+pub struct BodySegment {
+    coordinates: Uvec2,
+    from:        Direction,
+    to:          Direction,
+}
+
+impl BodySegment {
+    pub fn new(coordinates: Uvec2, from: Direction, to: Direction) -> Self {
+        Self { coordinates: coordinates, from: from, to: to } 
+    }
+
+    pub fn get_coordinates(&self) -> Uvec2 {
+        self.coordinates
+    }
+
+    pub fn get_from(&self) -> Direction {
+        self.from
+    }
+
+    pub fn get_to(&self) -> Direction {
+        self.to
+    }
+
+    pub fn set_coordinates(&mut self, coordinates: Uvec2) {
+        self.coordinates = coordinates;
+    }
+
+    pub fn set_from(&mut self, from: Direction) {
+        self.from = from;
+    }
+
+    pub fn set_to(&mut self, to: Direction) {
+        self.to = to;
+    }
+}

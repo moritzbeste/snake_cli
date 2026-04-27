@@ -1,15 +1,15 @@
 use std::collections::VecDeque;
 
 use crate::hamilton::Hamilton;
-use crate::utility::{Uvec2, Direction};
+use crate::utility::{Uvec2, Direction, BodySegment};
 
-pub struct Snake {
+pub struct SnakeHamilton {
     size:     Uvec2,
     body:     VecDeque<BodySegment>,
     hamilton: Hamilton,
 }
 
-impl Snake {
+impl SnakeHamilton {
     pub fn new(start: Uvec2, n_parts: usize, size: Uvec2) -> Self {        
         // ============================================ Build Hamilton =============================================
         let mut hamilton = Hamilton::new(size);
@@ -73,12 +73,11 @@ impl Snake {
         }
     }
 
-    fn find_path(&self, head_pos: Uvec2, head_to: Direction, food_index: usize) -> Direction {
+    fn find_path(&mut self, head_pos: Uvec2, head_to: Direction, food_index: usize) -> Direction {
         let head_index: usize = self.hamilton.get_member(head_pos);
         let tail_index: usize = self.hamilton.get_member(self.peek_tail().get_coordinates());
 
         let mut best_cont: Direction = Direction::opposite(head_to);
-        let mut next_cont: Direction = best_cont;
         let mut best_dist: usize = self.size.x * self.size.y;
         let max_index: usize =  best_dist - 1;
         for d in Direction::ALL {
@@ -88,10 +87,6 @@ impl Snake {
                 Option::Some(v) => self.hamilton.get_member(v),
                 Option::None => continue,
             };
-
-            if self.hamilton.is_next(head_index, check_index) {
-                next_cont = d;
-            }
 
             if !Hamilton::is_between(head_index, tail_index, check_index) {
                 let dist_food: usize;
@@ -107,8 +102,7 @@ impl Snake {
                 }
             }
         }
-        if best_cont == Direction::opposite(head_to) {next_cont }
-        else { best_cont }
+        best_cont
     }
 
     pub fn peek_head(&self) -> &BodySegment {
@@ -122,41 +116,4 @@ impl Snake {
     fn peek_tail(&self) -> &BodySegment {
         self.body.back().unwrap()
     } 
-}
-
-#[derive(Clone)]
-pub struct BodySegment {
-    coordinates: Uvec2,
-    from:        Direction,
-    to:          Direction,
-}
-
-impl BodySegment {
-    pub fn new(coordinates: Uvec2, from: Direction, to: Direction) -> Self {
-        Self { coordinates: coordinates, from: from, to: to } 
-    }
-
-    pub fn get_coordinates(&self) -> Uvec2 {
-        self.coordinates
-    }
-
-    pub fn get_from(&self) -> Direction {
-        self.from
-    }
-
-    pub fn get_to(&self) -> Direction {
-        self.to
-    }
-
-    pub fn set_coordinates(&mut self, coordinates: Uvec2) {
-        self.coordinates = coordinates;
-    }
-
-    pub fn set_from(&mut self, from: Direction) {
-        self.from = from;
-    }
-
-    pub fn set_to(&mut self, to: Direction) {
-        self.to = to;
-    }
 }

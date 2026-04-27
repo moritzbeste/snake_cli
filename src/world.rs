@@ -1,4 +1,4 @@
-use crate::{snake::{BodySegment, Snake}, utility::{Direction, Uvec2}};
+use crate::{snake_hamilton::{SnakeHamilton}, utility::{Direction, Uvec2, BodySegment}};
 use std::collections::{HashSet};
 use std::io::{stdout};
 use crossterm::{
@@ -16,7 +16,7 @@ pub struct World {
     n_steps: u32,
     n_parts: u32,
     empty: HashSet<Uvec2>,
-    snake: Snake,
+    snake: SnakeHamilton,
     food_pos: Uvec2,
 }
 
@@ -38,7 +38,7 @@ impl World {
         if n_parts < 1 { panic!("Initial Snake Length too short!"); }
         let start_x: usize = 1;
         let start: Uvec2 = Uvec2 { x: start_x, y: size.y / 2 };
-        let snake: Snake = Snake::new(start, n_parts, size);
+        let snake: SnakeHamilton = SnakeHamilton::new(start, n_parts, size);
         // add snake position to data structures
         empty.remove(&start);
         let from: Direction = snake.peek_head().get_from();

@@ -11,14 +11,14 @@ use crossterm::{
 mod utility;
 mod world;
 mod hamilton;
-mod snake;
+mod snake_hamilton;
 use world::{World, GameState};
 
 fn main() -> Result<(), io::Error> {
     let (w, h) = size()?;
 
     // ============================================ Hyperparameters ============================================
-    let sleep_ms: u64 = 5;
+    let sleep_ms: u64 = 1;
     let n_parts: usize = 3;
     let color_snake: Color = Color::Green;
     let color_food:  Color = Color::Yellow;
